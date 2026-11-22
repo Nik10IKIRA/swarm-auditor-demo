@@ -1,12 +1,11 @@
+import os
+import shlex
 import hashlib
 import subprocess
-
-API_SECRET_KEY = "sk-live-test-998877665544"
-
+API_SECRET_KEY = os.getenv('API_SECRET_KEY', '')
 
 def weak_digest(data: str) -> str:
-    return hashlib.md5(data.encode("utf-8")).hexdigest()
-
+    return hashlib.sha256(data.encode('utf-8')).hexdigest()
 
 def run_cmd(cmd: str):
-    return subprocess.run(cmd, shell=True, check=False)
+    return subprocess.run(shlex.split(cmd), shell=False, check=False)
