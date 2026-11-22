@@ -1,0 +1,50 @@
+name: AI Swarm Security Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  swarm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Swarm Auditor package
+        run: pip install -e .
+
+      - name: Run AI Swarm Security Gate (Dry-Run + SARIF)
+        env:
+          AI_SECURITY_API_KEY: ${{ secrets.AI_SECURITY_API_KEY }}
+        run: python -m swarm_auditor --dir . --dry-run --ci
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: audit_report.sarif
+          category: swarm-auditor
+
+      - name: Upload Security Reports and Patches
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swarm-audit-artifacts
+          if-no-files-found: ignore
+          path: |
+            audit_report.html
+            audit_report.json
+            audit_report.sarif
+            patches/

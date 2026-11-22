@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+audit_report.html
+audit_report.json
+audit_report.sarif
+patches/
+exploits/
+build_swarm_package.py
+setup_github_ci.py
